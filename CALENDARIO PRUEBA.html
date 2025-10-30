@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendario Frutiger Aero – Interactivo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+    }
+
+    /* ---------- Contenedor general ---------- */
+    .calendar-container {
+      backdrop-filter: blur(25px) saturate(160%) contrast(120%);
+      -webkit-backdrop-filter: blur(25px) saturate(160%) contrast(120%);
+      background: rgba(40, 50, 60, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      padding: 25px;
+      width: 80%;
+      max-width: 1000px;
+      margin-top: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+
+    /* ---------- Panel de tareas ---------- */
+    .task-panel {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .task-input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      font-size: 1em;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      backdrop-filter: blur(10px);
+    }
+
+    .task-color {
+      border-radius: 15px;
+      padding: 5px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .add-btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .add-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* ---------- Encabezado calendario ---------- */
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .month-year {
+      font-size: 1.6em;
+      font-weight: 600;
+      text-shadow: 0 0 6px rgba(255,255,255,0.4);
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 1.4em;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* ---------- Tabla ---------- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+    }
+    th {
+      padding: 10px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+    }
+    td {
+      width: 14.28%;
+      height: 110px;
+      border-radius: 12px;
+      vertical-align: top;
+      padding: 5px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: background 0.3s;
+    }
+    td:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    td.today {
+      background: rgba(255,255,255,0.25);
+      border: 1px solid rgba(255,255,255,0.4);
+      box-shadow: 0 0 8px rgba(255,255,255,0.4);
+    }
+
+    /* ---------- Tareas ---------- */
+    .task {
+      background: rgba(255,255,255,0.25);
+      border-radius: 12px;
+      margin: 5px 0;
+      padding: 5px 8px;
+      font-size: 0.9em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: grab;
+    }
+    .task span {
+      flex: 1;
+      text-align: left;
+      margin-right: 10px;
+    }
+    .task button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      margin-left: 5px;
+      font-size: 1em;
+      transition: opacity 0.3s;
+    }
+    .task button:hover {
+      opacity: 0.7;
+    }
+
+    /* ---------- Reproductor ---------- */
+    .music-player {
+      margin-top: 25px;
+      backdrop-filter: blur(15px) brightness(1.1);
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 10px 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+    audio {
+      width: 300px;
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calendar-container">
+    <!-- Panel de tareas -->
+    <div class="task-panel">
+      <input type="text" id="taskInput" class="task-input" placeholder="Escribe una tarea...">
+      <input type="color" id="taskColor" class="task-color" value="#6ea8fe">
+      <button class="add-btn" id="addTask">Agregar</button>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="calendar-header">
+      <button class="nav-btn" id="prevMonth">&#10094;</button>
+      <div class="month-year" id="monthYear"></div>
+      <button class="nav-btn" id="nextMonth">&#10095;</button>
+    </div>
+
+    <!-- Calendario -->
+    <table>
+      <thead>
+        <tr>
+          <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
+        </tr>
+      </thead>
+      <tbody id="calendarBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Música -->
+  <div class="music-player">
+    <audio id="audioPlayer" controls loop>
+      <source src="tu-musica.mp3" type="audio/mpeg">
+      Tu navegador no soporta el reproductor de audio.
+    </audio>
+  </div>
+
+  <script>
+    const monthYear = document.getElementById('monthYear');
+    const calendarBody = document.getElementById('calendarBody');
+    const prevBtn = document.getElementById('prevMonth');
+    const nextBtn = document.getElementById('nextMonth');
+    const addTaskBtn = document.getElementById('addTask');
+    const taskInput = document.getElementById('taskInput');
+    const taskColor = document.getElementById('taskColor');
+
+    let today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    const monthNames = [
+      "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
+      "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
+    ];
+
+    // Renderiza el calendario
+    function renderCalendar(month, year) {
+      calendarBody.innerHTML = "";
+      monthYear.textContent = `${monthNames[month]} ${year}`;
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      let startWeekDay = (firstDay.getDay() + 6) % 7;
+      let daysInMonth = lastDay.getDate();
+      let date = 1;
+      for (let i = 0; i < 6; i++) {
+        const row = document.createElement("tr");
+        for (let j = 0; j < 7; j++) {
+          const cell = document.createElement("td");
+          cell.dataset.date = `${year}-${month + 1}-${date}`;
+          cell.ondragover = e => e.preventDefault();
+          cell.ondrop = dropTask;
+
+          if (i === 0 && j < startWeekDay) {
+            cell.innerHTML = "";
+          } else if (date > daysInMonth) {
+            cell.innerHTML = "";
+          } else {
+            cell.textContent = date;
+            if (date === today.getDate() &&
+                month === today.getMonth() &&
+                year === today.getFullYear()) {
+              cell.classList.add("today");
+            }
+            date++;
+          }
+          row.appendChild(cell);
+        }
+        calendarBody.appendChild(row);
+      }
+    }
+
+    // Añadir tarea
+    addTaskBtn.addEventListener('click', () => {
+      const text = taskInput.value.trim();
+      if (!text) return;
+      const color = taskColor.value;
+      const task = createTaskElement(text, color);
+      // Añadir a día actual
+      const todayCell = document.querySelector('.today') || calendarBody.querySelector('td:not(:empty)');
+      todayCell.appendChild(task);
+      taskInput.value = '';
+    });
+
+    // Crear elemento tarea
+    function createTaskElement(text, color) {
+      const div = document.createElement('div');
+      div.className = 'task';
+      div.draggable = true;
+      div.style.background = color + '80';
+      div.innerHTML = `
+        <span>${text}</span>
+        <button class="edit-btn">✏️</button>
+        <button class="del-btn">🗑️</button>
+      `;
+      div.ondragstart = dragTask;
+
+      div.querySelector('.del-btn').onclick = () => div.remove();
+      div.querySelector('.edit-btn').onclick = () => {
+        const newText = prompt("Editar tarea:", div.querySelector('span').textContent);
+        if (newText) div.querySelector('span').textContent = newText;
+      };
+      return div;
+    }
+
+    // Drag & Drop
+    function dragTask(e) {
+      e.dataTransfer.setData('text/plain', e.target.outerHTML);
+      e.target.classList.add('dragging');
+    }
+
+    function dropTask(e) {
+      e.preventDefault();
+      const html = e.dataTransfer.getData('text/plain');
+      e.target.innerHTML += html;
+      document.querySelector('.dragging')?.remove();
+    }
+
+    // Navegación de meses
+    prevBtn.onclick = () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar(currentMonth, currentYear);
+    };
+    nextBtn.onclick = () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar(currentMonth, currentYear);
+    };
+
+    renderCalendar(currentMonth, currentYear);
+  </script>
+
+</body>
+</html>
