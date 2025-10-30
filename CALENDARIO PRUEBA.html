@@ -1,339 +1,469 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Calendario Frutiger Aero – Interactivo</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: url('background.jpg') no-repeat center center fixed;
-      background-size: cover;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: #fff;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Calendario Frutiger Aero — GitHub Pages</title>
+<style>
+  :root{
+    --glass-bg: rgba(28,34,40,0.46);
+    --glass-border: rgba(255,255,255,0.12);
+    --accent: #6ea8fe;
+    --text: #ffffff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, Arial, sans-serif;-webkit-font-smoothing:antialiased;}
+  body{
+    /* Cambia aquí la URL del fondo si quieres: */
+    /* background: url('https://tu-imagen.jpg') center/cover fixed no-repeat; */
+    background: linear-gradient(180deg,#06121a 0%,#0b2740 100%);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    padding:28px;
+  }
 
-    /* ---------- Contenedor general ---------- */
-    .calendar-container {
-      backdrop-filter: blur(25px) saturate(160%) contrast(120%);
-      -webkit-backdrop-filter: blur(25px) saturate(160%) contrast(120%);
-      background: rgba(40, 50, 60, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 25px;
-      padding: 25px;
-      width: 80%;
-      max-width: 1000px;
-      margin-top: 30px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-    }
+  .page {
+    width: 96%;
+    max-width:1200px;
+    min-width:760px;
+  }
 
-    /* ---------- Panel de tareas ---------- */
-    .task-panel {
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+  /* Top: legend + tasks */
+  .top-row{display:flex;gap:16px;margin-bottom:16px}
+  .legend {
+    width:230px;
+    border-radius:14px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border:1px solid var(--glass-border);backdrop-filter: blur(14px) saturate(120%);box-shadow:0 12px 40px rgba(0,0,0,0.45);
+  }
+  .legend h4{margin:0 0 8px 0;font-size:14px}
+  .legend .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,0.02)}
+  .pill{width:14px;height:14px;border-radius:6px;margin-right:8px;border:1px solid rgba(255,255,255,0.12)}
+  .legend .label{font-size:13px;color:rgba(255,255,255,0.95)}
 
-    .task-input {
-      flex: 1;
-      padding: 10px 15px;
-      border-radius: 20px;
-      border: none;
-      outline: none;
-      font-size: 1em;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      backdrop-filter: blur(10px);
-    }
+  .panel {
+    flex:1;
+    border-radius:14px;padding:12px;background:var(--glass-bg);
+    border:1px solid var(--glass-border);backdrop-filter: blur(18px);box-shadow:0 18px 50px rgba(0,0,0,0.55);
+  }
 
-    .task-color {
-      border-radius: 15px;
-      padding: 5px;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      background: rgba(255,255,255,0.2);
-    }
+  .controls{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+  .controls input[type="text"]{
+    flex:1;padding:10px 14px;border-radius:14px;border:none;background:rgba(255,255,255,0.06);color:var(--text);outline:none;
+  }
+  .controls select{padding:9px;border-radius:12px;border:none;background:rgba(255,255,255,0.06);color:var(--text)}
+  .controls button{padding:9px 12px;border-radius:12px;border:none;background:rgba(255,255,255,0.12);cursor:pointer;color:var(--text)}
 
-    .add-btn {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 15px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .add-btn:hover {
-      background: rgba(255,255,255,0.3);
-    }
+  .task-pool{display:flex;gap:8px;flex-wrap:wrap;padding:8px;border-radius:10px;background:rgba(0,0,0,0.04);min-height:54px}
 
-    /* ---------- Encabezado calendario ---------- */
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
+  /* task card */
+  .task{
+    display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;background:#fff;color:#000;min-width:180px;
+    cursor:grab;user-select:none;
+  }
+  .task .left{display:flex;align-items:center;gap:8px;flex:1}
+  .task input[type="checkbox"]{transform:scale(1.05)}
+  .task .title{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .task .controls{display:flex;gap:6px}
+  .task .controls button{background:none;border:none;cursor:pointer;font-size:15px}
+  .task.completed{opacity:0.45;text-decoration:line-through}
 
-    .month-year {
-      font-size: 1.6em;
-      font-weight: 600;
-      text-shadow: 0 0 6px rgba(255,255,255,0.4);
-    }
+  /* calendar */
+  .calendar {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border-radius:14px;padding:14px;border:1px solid var(--glass-border);backdrop-filter: blur(18px);box-shadow:0 18px 50px rgba(0,0,0,0.55);
+  }
 
-    .nav-btn {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: #fff;
-      font-size: 1.4em;
-      padding: 5px 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .nav-btn:hover {
-      background: rgba(255,255,255,0.25);
-    }
+  .cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .cal-nav{display:flex;gap:8px}
+  .cal-nav button{padding:8px 12px;border-radius:10px;border:none;background:rgba(255,255,255,0.06);cursor:pointer}
+  .month-title{font-weight:700;font-size:18px}
 
-    /* ---------- Tabla ---------- */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: center;
-    }
-    th {
-      padding: 10px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.9);
-    }
-    td {
-      width: 14.28%;
-      height: 110px;
-      border-radius: 12px;
-      vertical-align: top;
-      padding: 5px;
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: background 0.3s;
-    }
-    td:hover {
-      background: rgba(255,255,255,0.1);
-    }
-    td.today {
-      background: rgba(255,255,255,0.25);
-      border: 1px solid rgba(255,255,255,0.4);
-      box-shadow: 0 0 8px rgba(255,255,255,0.4);
-    }
+  table.month{width:100%;border-collapse:collapse}
+  table.month th{padding:8px;font-weight:700;color:rgba(255,255,255,0.96);font-size:13px}
+  table.month td{width:14.2857%;vertical-align:top;padding:8px;border-radius:10px;height:120px;border:1px solid rgba(255,255,255,0.03);position:relative}
+  table.month td .daynum{position:absolute;right:8px;top:6px;font-size:12px;color:rgba(255,255,255,0.9)}
+  table.month td.empty{background:transparent;color:rgba(255,255,255,0.25)}
+  table.month td.today{box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)}
 
-    /* ---------- Tareas ---------- */
-    .task {
-      background: rgba(255,255,255,0.25);
-      border-radius: 12px;
-      margin: 5px 0;
-      padding: 5px 8px;
-      font-size: 0.9em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: grab;
-    }
-    .task span {
-      flex: 1;
-      text-align: left;
-      margin-right: 10px;
-    }
-    .task button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #fff;
-      margin-left: 5px;
-      font-size: 1em;
-      transition: opacity 0.3s;
-    }
-    .task button:hover {
-      opacity: 0.7;
-    }
+  .cell-task{display:flex;align-items:center;gap:6px;padding:6px;border-radius:10px;margin-top:24px;margin-bottom:6px;font-size:12px;cursor:grab}
 
-    /* ---------- Reproductor ---------- */
-    .music-player {
-      margin-top: 25px;
-      backdrop-filter: blur(15px) brightness(1.1);
-      background: rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 10px 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-    }
-    audio {
-      width: 300px;
-      filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
-    }
-  </style>
+  /* Floating player */
+  .player{
+    position:fixed;left:40px;bottom:40px;width:320px;padding:12px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.12);backdrop-filter: blur(12px);z-index:9999;box-shadow:0 30px 70px rgba(0,0,0,0.6);display:flex;gap:12px;align-items:center;cursor:grab;
+  }
+  .player .thumb{width:56px;height:56px;border-radius:999px;overflow:hidden;background:linear-gradient(180deg,#ddd,#bbb);flex-shrink:0;border:1px solid rgba(255,255,255,0.08)}
+  .player .info{flex:1;min-width:0}
+  .player .info .title{font-weight:700;font-size:14px}
+  .player .info .time{font-size:12px;opacity:.85}
+  .player .controls{display:flex;gap:8px;align-items:center}
+  .player .controls button{border:none;background:rgba(255,255,255,0.07);padding:8px;border-radius:8px;cursor:pointer}
+  .player input[type="file"]{display:none}
+
+  @media (max-width:900px){
+    .page{min-width:unset;width:98%}
+    .top-row{flex-direction:column}
+    .legend{width:100%}
+  }
+</style>
 </head>
 <body>
+  <div class="page">
 
-  <div class="calendar-container">
-    <!-- Panel de tareas -->
-    <div class="task-panel">
-      <input type="text" id="taskInput" class="task-input" placeholder="Escribe una tarea...">
-      <input type="color" id="taskColor" class="task-color" value="#6ea8fe">
-      <button class="add-btn" id="addTask">Agregar</button>
+    <div class="top-row">
+      <div class="legend">
+        <h4>Leyenda de categorías</h4>
+        <div class="row"><div><span class="pill" style="background:#6ea8fe"></span><span class="label">Trabajo / Estudios</span></div><div class="label">Azul</div></div>
+        <div class="row"><div><span class="pill" style="background:#ffb020"></span><span class="label">Personal / Social</span></div><div class="label">Amarillo</div></div>
+        <div class="row"><div><span class="pill" style="background:#7bd389"></span><span class="label">Salud / Fitness</span></div><div class="label">Verde</div></div>
+        <div class="row"><div><span class="pill" style="background:#ff6b6b"></span><span class="label">Finanzas</span></div><div class="label">Rojo</div></div>
+        <div class="row"><div><span class="pill" style="background:#b08cff"></span><span class="label">Familia</span></div><div class="label">Morado</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="controls">
+          <input id="newTask" type="text" placeholder="Escribe la tarea..." />
+          <select id="catSelect" title="Categoría">
+            <option value="trabajo" data-color="#6ea8fe">Trabajo / Estudios</option>
+            <option value="personal" data-color="#ffb020">Personal / Social</option>
+            <option value="salud" data-color="#7bd389">Salud / Fitness</option>
+            <option value="finanzas" data-color="#ff6b6b">Finanzas</option>
+            <option value="familia" data-color="#b08cff">Familia</option>
+          </select>
+          <button id="addBtn">➕ Agregar</button>
+        </div>
+        <div style="font-size:13px;margin-bottom:6px">Pool de tareas — arrastra al día del calendario</div>
+        <div id="pool" class="task-pool" ondragover="event.preventDefault()"></div>
+      </div>
     </div>
 
-    <!-- Encabezado -->
-    <div class="calendar-header">
-      <button class="nav-btn" id="prevMonth">&#10094;</button>
-      <div class="month-year" id="monthYear"></div>
-      <button class="nav-btn" id="nextMonth">&#10095;</button>
+    <div class="calendar">
+      <div class="cal-header">
+        <div class="cal-nav">
+          <button id="prevM">&larr;</button>
+          <button id="nextM">&rarr;</button>
+        </div>
+        <div class="month-title" id="monthTitle">MES AÑO</div>
+        <div style="width:72px"></div>
+      </div>
+
+      <table class="month">
+        <thead><tr><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th></tr></thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
     </div>
 
-    <!-- Calendario -->
-    <table>
-      <thead>
-        <tr>
-          <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
-        </tr>
-      </thead>
-      <tbody id="calendarBody"></tbody>
-    </table>
   </div>
 
-  <!-- Música -->
-  <div class="music-player">
-    <audio id="audioPlayer" controls loop>
-      <source src="tu-musica.mp3" type="audio/mpeg">
-      Tu navegador no soporta el reproductor de audio.
-    </audio>
+  <!-- Floating player -->
+  <div class="player" id="player" title="Arrástrame">
+    <div class="thumb" id="thumb"></div>
+    <div class="info">
+      <div class="title" id="trackTitle">No hay pista</div>
+      <div class="time" id="trackTime">00:00 / 00:00</div>
+    </div>
+    <div class="controls">
+      <button id="prevTrack">⏮️</button>
+      <button id="playPause">▶️</button>
+      <button id="nextTrack">⏭️</button>
+      <label style="margin-left:6px;cursor:pointer;padding:6px;border-radius:8px;background:rgba(255,255,255,0.04)"><input id="audioInput" type="file" accept="audio/*" multiple />Subir</label>
+    </div>
   </div>
 
-  <script>
-    const monthYear = document.getElementById('monthYear');
-    const calendarBody = document.getElementById('calendarBody');
-    const prevBtn = document.getElementById('prevMonth');
-    const nextBtn = document.getElementById('nextMonth');
-    const addTaskBtn = document.getElementById('addTask');
-    const taskInput = document.getElementById('taskInput');
-    const taskColor = document.getElementById('taskColor');
+<script>
+/* ----------------- Helpers & storage ----------------- */
+const uid = ()=> 'id'+Date.now()+Math.floor(Math.random()*999);
+const STORAGE = {TASKS:'aero_tasks_v2', PLAYER_POS:'aero_player_pos_v2', PLAYER_LIST:'aero_player_list_v2'};
 
-    let today = new Date();
-    let currentMonth = today.getMonth();
-    let currentYear = today.getFullYear();
-    const monthNames = [
-      "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
-      "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
-    ];
+function save(valKey,obj){ localStorage.setItem(valKey, JSON.stringify(obj)); }
+function load(valKey, def){ try{ const r = JSON.parse(localStorage.getItem(valKey)); return r===null?def:r }catch(e){return def} }
 
-    // Renderiza el calendario
-    function renderCalendar(month, year) {
-      calendarBody.innerHTML = "";
-      monthYear.textContent = `${monthNames[month]} ${year}`;
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      let startWeekDay = (firstDay.getDay() + 6) % 7;
-      let daysInMonth = lastDay.getDate();
-      let date = 1;
-      for (let i = 0; i < 6; i++) {
-        const row = document.createElement("tr");
-        for (let j = 0; j < 7; j++) {
-          const cell = document.createElement("td");
-          cell.dataset.date = `${year}-${month + 1}-${date}`;
-          cell.ondragover = e => e.preventDefault();
-          cell.ondrop = dropTask;
+/* ----------------- Tasks data ----------------- */
+let tasks = load(STORAGE.TASKS, {}); // id -> {id,title,category,color,date,completed}
+const pool = document.getElementById('pool');
 
-          if (i === 0 && j < startWeekDay) {
-            cell.innerHTML = "";
-          } else if (date > daysInMonth) {
-            cell.innerHTML = "";
-          } else {
-            cell.textContent = date;
-            if (date === today.getDate() &&
-                month === today.getMonth() &&
-                year === today.getFullYear()) {
-              cell.classList.add("today");
-            }
-            date++;
-          }
-          row.appendChild(cell);
-        }
-        calendarBody.appendChild(row);
+function createTaskObj(title, category, color){
+  const id = uid();
+  return { id, title, category, color, date: null, completed: false };
+}
+
+function saveTasks(){ save(STORAGE.TASKS, tasks); }
+
+function renderPool(){
+  pool.innerHTML = '';
+  Object.values(tasks).filter(t=>!t.date).forEach(t=>{
+    pool.appendChild(renderTaskCard(t));
+  });
+}
+
+/* create DOM node for task */
+function renderTaskCard(t){
+  const div = document.createElement('div');
+  div.className = 'task';
+  if(t.completed) div.classList.add('completed');
+  div.style.background = hexToRGBA(t.color,0.88);
+  div.draggable = true;
+  div.dataset.id = t.id;
+  div.innerHTML = `<div class="left"><input type="checkbox" ${t.completed?'checked':''} /><div class="title" title="${escapeHtml(t.title)}">${escapeHtml(t.title)}</div></div>
+  <div class="controls"><button class="edit">✏️</button><button class="del">🗑️</button></div>`;
+  // drag
+  div.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', t.id); setTimeout(()=>div.classList.add('dragging'),10); });
+  div.addEventListener('dragend', ()=>div.classList.remove('dragging'));
+  // checkbox toggle
+  const cb = div.querySelector('input[type="checkbox"]');
+  cb.addEventListener('change', (ev)=>{
+    tasks[t.id].completed = ev.target.checked;
+    saveTasks(); renderAll();
+  });
+  // edit
+  div.querySelector('.edit').addEventListener('click', ()=>{
+    const val = prompt('Editar tarea', t.title);
+    if(val!==null){ tasks[t.id].title = val.trim(); saveTasks(); renderAll(); }
+  });
+  // delete
+  div.querySelector('.del').addEventListener('click', ()=>{
+    if(confirm('Eliminar tarea?')){ delete tasks[t.id]; saveTasks(); renderAll(); }
+  });
+  return div;
+}
+
+/* ----------------- Calendar rendering & drag drop ----------------- */
+const monthNames = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+let today = new Date();
+let currentMonth = today.getMonth();
+let currentYear = today.getFullYear();
+
+const calBody = document.getElementById('calendarBody');
+const monthTitle = document.getElementById('monthTitle');
+
+function startWeekIndex(d){ return (d.getDay()+6)%7 } // Monday=0
+function renderCalendar(m,y){
+  calBody.innerHTML=''; monthTitle.textContent = `${monthNames[m]} ${y}`;
+  const first = new Date(y,m,1), last = new Date(y,m+1,0);
+  const start = startWeekIndex(first), days = last.getDate();
+  let d=1;
+  for(let r=0;r<6;r++){
+    const tr = document.createElement('tr');
+    for(let c=0;c<7;c++){
+      const td = document.createElement('td');
+      td.ondragover = e => e.preventDefault();
+      td.ondrop = handleDrop;
+      if(r===0 && c<start){ td.className='empty'; td.innerHTML=''; }
+      else if(d>days){ td.className='empty'; td.innerHTML=''; }
+      else{
+        td.dataset.date = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        td.innerHTML = `<div class="daynum">${d}</div>`;
+        // append tasks matching date
+        Object.values(tasks).filter(t=>t.date===td.dataset.date).forEach(t=>{
+          td.appendChild(renderCellTask(t));
+        });
+        if(y===today.getFullYear() && m===today.getMonth() && d===today.getDate()) td.classList.add('today');
+        d++;
       }
+      tr.appendChild(td);
     }
+    calBody.appendChild(tr);
+  }
+}
 
-    // Añadir tarea
-    addTaskBtn.addEventListener('click', () => {
-      const text = taskInput.value.trim();
-      if (!text) return;
-      const color = taskColor.value;
-      const task = createTaskElement(text, color);
-      // Añadir a día actual
-      const todayCell = document.querySelector('.today') || calendarBody.querySelector('td:not(:empty)');
-      todayCell.appendChild(task);
-      taskInput.value = '';
-    });
+function renderCellTask(t){
+  const div = document.createElement('div');
+  div.className='cell-task';
+  div.style.background = hexToRGBA(t.color, 0.92);
+  if(t.completed) div.style.opacity = '0.45', div.style.textDecoration='line-through';
+  div.draggable = true;
+  div.dataset.id = t.id;
+  div.innerHTML = `<div class="short-title" title="${escapeHtml(t.title)}">${escapeHtml(t.title)}</div>`;
+  div.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', t.id); setTimeout(()=>div.style.opacity='0.4',10); });
+  div.addEventListener('dragend', e=>{ div.style.opacity='1'; });
+  // double click to edit quickly
+  div.addEventListener('dblclick', ()=>{ const val = prompt('Editar tarea', t.title); if(val!==null){ t.title = val.trim(); saveTasks(); renderAll(); } });
+  return div;
+}
 
-    // Crear elemento tarea
-    function createTaskElement(text, color) {
-      const div = document.createElement('div');
-      div.className = 'task';
-      div.draggable = true;
-      div.style.background = color + '80';
-      div.innerHTML = `
-        <span>${text}</span>
-        <button class="edit-btn">✏️</button>
-        <button class="del-btn">🗑️</button>
-      `;
-      div.ondragstart = dragTask;
+function handleDrop(e){
+  e.preventDefault();
+  const id = e.dataTransfer.getData('text/plain');
+  if(!id) return;
+  const td = e.currentTarget;
+  const date = td.dataset.date;
+  if(!date) return;
+  tasks[id].date = date;
+  saveTasks(); renderAll();
+}
 
-      div.querySelector('.del-btn').onclick = () => div.remove();
-      div.querySelector('.edit-btn').onclick = () => {
-        const newText = prompt("Editar tarea:", div.querySelector('span').textContent);
-        if (newText) div.querySelector('span').textContent = newText;
-      };
-      return div;
-    }
+/* ----------------- UI wiring for add task ----------------- */
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  const txt = document.getElementById('newTask').value.trim();
+  if(!txt){ alert('Escribe una tarea'); return; }
+  const sel = document.getElementById('catSelect');
+  const color = sel.options[sel.selectedIndex].dataset.color || '#6ea8fe';
+  const id = uid();
+  tasks[id] = { id, title: txt, category: sel.value, color, date: null, completed:false };
+  saveTasks(); document.getElementById('newTask').value=''; renderAll();
+});
 
-    // Drag & Drop
-    function dragTask(e) {
-      e.dataTransfer.setData('text/plain', e.target.outerHTML);
-      e.target.classList.add('dragging');
-    }
+/* ----------------- Helpers ----------------- */
+function hexToRGBA(hex, a=1){
+  const c = hex.replace('#',''); const r=parseInt(c.slice(0,2),16), g=parseInt(c.slice(2,4),16), b=parseInt(c.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
 
-    function dropTask(e) {
-      e.preventDefault();
-      const html = e.dataTransfer.getData('text/plain');
-      e.target.innerHTML += html;
-      document.querySelector('.dragging')?.remove();
-    }
+/* ----------------- Player: floating, draggable, playlist ----------------- */
+const player = document.getElementById('player'), audioInput = document.getElementById('audioInput');
+const trackTitle = document.getElementById('trackTitle'), trackTime = document.getElementById('trackTime'), thumb = document.getElementById('thumb');
+const playBtn = document.getElementById('playPause'), prevBtn = document.getElementById('prevTrack'), nextBtn = document.getElementById('nextTrack');
 
-    // Navegación de meses
-    prevBtn.onclick = () => {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
+let audio = new Audio();
+let playlist = load(STORAGE.PLAYER_LIST, [
+  {name:'Demo 1 - SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'},
+  {name:'Demo 2 - SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'},
+  {name:'Demo 3 - SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'}
+]);
+let idx = 0, isPlaying=false;
+
+/* load last position of player */
+(function restorePlayer(){
+  const pos = load(STORAGE.PLAYER_POS, null);
+  if(pos && typeof pos.x==='number' && typeof pos.y==='number'){
+    player.style.left = pos.x + 'px'; player.style.top = pos.y + 'px'; player.style.bottom='auto';
+  }
+})();
+
+function savePlayerPos(){
+  const rect = player.getBoundingClientRect();
+  save(STORAGE.PLAYER_POS, {x: rect.left, y: rect.top});
+}
+
+/* draggable player */
+let dragging=false, offset={x:0,y:0};
+player.addEventListener('mousedown', (e)=>{ dragging=true; player.classList.add('dragging'); offset.x = e.clientX - player.getBoundingClientRect().left; offset.y = e.clientY - player.getBoundingClientRect().top; });
+document.addEventListener('mousemove', (e)=>{ if(!dragging) return; player.style.left = (e.clientX - offset.x) + 'px'; player.style.top = (e.clientY - offset.y) + 'px'; player.style.bottom='auto'; });
+document.addEventListener('mouseup', ()=>{ if(dragging){ dragging=false; player.classList.remove('dragging'); savePlayerPos(); } });
+
+/* file upload for local files (works locally; files kept in session via object URL) */
+audioInput.addEventListener('change', (e)=>{
+  const files = Array.from(e.target.files||[]);
+  files.forEach(f=>{
+    const url = URL.createObjectURL(f);
+    playlist.push({name:f.name, url});
+  });
+  save(STORAGE.PLAYER_LIST, playlist);
+  if(!audio.src) loadTrack( playlist.length- files.length >=0 ? playlist.length-files.length:0 );
+  e.target.value = '';
+});
+
+/* load track by index */
+function loadTrack(i){
+  if(!playlist.length) return;
+  if(i<0) i = playlist.length-1;
+  if(i>=playlist.length) i = 0;
+  idx = i;
+  audio.src = playlist[idx].url;
+  trackTitle.textContent = playlist[idx].name;
+  thumb.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.12))';
+  audio.onloadedmetadata = ()=> updateTime();
+  audio.onended = ()=> nextTrack();
+  if(isPlaying){ audio.play().catch(()=>{}); }
+}
+
+/* controls */
+playBtn.addEventListener('click', ()=>{
+  if(!audio.src){ loadTrack(idx); }
+  if(audio.paused){ audio.play().catch(()=>{}); playBtn.textContent='⏸️'; isPlaying=true; }
+  else{ audio.pause(); playBtn.textContent='▶️'; isPlaying=false; }
+});
+prevBtn.addEventListener('click', ()=>{ if(!playlist.length) return; loadTrack((idx-1+playlist.length)%playlist.length); });
+nextBtn.addEventListener('click', ()=>{ if(!playlist.length) return; loadTrack((idx+1)%playlist.length); });
+
+audio.addEventListener('play', ()=>{ playBtn.textContent='⏸️'; isPlaying=true; });
+audio.addEventListener('pause', ()=>{ playBtn.textContent='▶️'; isPlaying=false; });
+
+function updateTime(){
+  const cur = audio.currentTime || 0, dur = audio.duration || 0;
+  trackTime.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+}
+setInterval(()=>{ if(!audio.paused && audio.src) updateTime(); }, 500);
+function formatTime(s){ if(!s||!isFinite(s)) return '00:00'; const m = Math.floor(s/60); const sec = Math.floor(s%60); return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+
+/* initially load first demo track */
+if(playlist.length) loadTrack(0);
+
+/* ----------------- Start rendering ----------------- */
+function renderAll(){ renderCalendar(currentMonth,currentYear); renderPool(); }
+renderAll();
+
+/* month nav */
+document.getElementById('prevM').addEventListener('click', ()=>{ currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--;} renderAll();});
+document.getElementById('nextM').addEventListener('click', ()=>{ currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++;} renderAll();});
+
+/* render calendar */
+function renderCalendar(m,y){
+  calBody.innerHTML=''; monthTitle.textContent = `${monthNames[m]} ${y}`;
+  const first = new Date(y,m,1), last = new Date(y,m+1,0);
+  const start = startWeek(first), days = last.getDate();
+  let day=1;
+  for(let r=0;r<6;r++){
+    const tr = document.createElement('tr');
+    for(let c=0;c<7;c++){
+      const td = document.createElement('td');
+      td.ondragover = e=>e.preventDefault(); td.ondrop = handleDrop;
+      if(r===0 && c<start){ td.className='empty'; td.innerHTML=''; }
+      else if(day>days){ td.className='empty'; td.innerHTML=''; }
+      else{
+        td.dataset.date = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        td.innerHTML = `<div class="daynum">${day}</div>`;
+        Object.values(tasks).filter(t=>t.date===td.dataset.date).forEach(t=>td.appendChild(renderCellTask(t)));
+        if(y===today.getFullYear() && m===today.getMonth() && day===today.getDate()) td.classList.add('today');
+        day++;
       }
-      renderCalendar(currentMonth, currentYear);
-    };
-    nextBtn.onclick = () => {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      renderCalendar(currentMonth, currentYear);
-    };
+      tr.appendChild(td);
+    }
+    calBody.appendChild(tr);
+  }
+}
 
-    renderCalendar(currentMonth, currentYear);
-  </script>
+function startWeek(d){ return (d.getDay()+6)%7 }
 
+/* handle drop */
+function handleDrop(e){
+  e.preventDefault();
+  const id = e.dataTransfer.getData('text/plain');
+  if(!id) return;
+  const td = e.currentTarget;
+  const date = td.dataset.date;
+  if(!date) return;
+  tasks[id].date = date; saveTasks(); renderAll();
+}
+
+/* render cell task */
+function renderCellTask(t){
+  const div = document.createElement('div');
+  div.className='cell-task'; div.style.background = hexToRGBA(t.color,0.94); if(t.completed) div.style.opacity='0.45';
+  div.draggable = true; div.dataset.id = t.id;
+  div.innerHTML = `<div class="short-title" title="${escapeHtml(t.title)}">${escapeHtml(t.title)}</div>`;
+  div.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', t.id); setTimeout(()=>div.style.opacity='0.5',10); });
+  div.addEventListener('dragend', e=>{ div.style.opacity='1'; });
+  div.addEventListener('dblclick', ()=>{ const val = prompt('Editar tarea', t.title); if(val!==null){ t.title = val.trim(); saveTasks(); renderAll(); }});
+  return div;
+}
+
+/* ----------------- init sample tasks (if none exist, optional) ----------------- */
+if(Object.keys(tasks).length===0){
+  // create 2 sample tasks for UX
+  const t1 = createTaskObj('Revisar notas', 'trabajo', '#6ea8fe'); t1.date = null; tasks[t1.id]=t1;
+  const t2 = createTaskObj('Ir al gimnasio', 'salud', '#7bd389'); t2.date = null; tasks[t2.id]=t2;
+  saveTasks();
+}
+
+/* helper to create task object quickly */
+function createTaskObj(title, category, color){ const id=uid(); return {id,title,category,color,date:null,completed:false}; }
+
+/* expose save on unload */
+window.addEventListener('beforeunload', ()=>{ saveTasks(); save(STORAGE.PLAYER_LIST, playlist); savePlayerPos(); });
+
+</script>
 </body>
 </html>
